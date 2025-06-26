@@ -4,7 +4,7 @@
 const { Document, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, Packer, AlignmentType, BorderStyle } = docx;
 
 /**
- * Creates a DOCX document for a single flight and shares it.
+ * Creates a DOCX document for a single flight and shares or opens it.
  * @param {Object} flightData - The flight object.
  */
 export async function exportSingleFlightToDocx(flightData) {
@@ -87,10 +87,9 @@ export async function exportSingleFlightToDocx(flightData) {
         }],
     });
 
-    // Generate the DOCX blob
     const blob = await Packer.toBlob(doc);
     
-    // START OF NEW/UPDATED CODE for sharing
+    // START OF UPDATED LOGIC for sharing/opening
     const fileName = `تقرير_رحلة_${flightData.fltNo}_${flightData.date}.docx`;
     const file = new File([blob], fileName, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
@@ -107,23 +106,16 @@ export async function exportSingleFlightToDocx(flightData) {
             alert('تعذر مشاركة الملف. قد لا يدعم جهازك هذه الميزة أو تم إلغاء المشاركة.');
         }
     } else {
-        // Fallback for browsers/devices that do not support Web Share API
-        console.log('Web Share API not supported. Falling back to download.');
+        // Fallback: Open file in a new window/tab if sharing is not supported
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert('ميزة المشاركة غير مدعومة في هذا المتصفح. سيتم تنزيل الملف مباشرة.');
+        window.open(url, '_blank');
+        alert('ميزة المشاركة غير مدعومة. تم فتح ملف التقرير في نافذة جديدة. يمكنك حفظه من النافذة الجديدة.');
     }
-    // END OF NEW/UPDATED CODE
+    // END OF UPDATED LOGIC
 }
 
 /**
- * Creates a DOCX document for admin statistics or all detailed flights and shares it.
+ * Creates a DOCX document for admin statistics or all detailed flights and shares or opens it.
  * @param {string} type - 'stats' or 'allFlights'.
  * @param {Object} data - Contains filtered flights, user counts, etc.
  * @param {string} filterMonth - Month in YYYY-MM format.
@@ -310,10 +302,9 @@ export async function exportAdminDataToDocx(type, data, filterMonth, filterUserE
         sections: sections,
     });
 
-    // Generate the DOCX blob
     const blob = await Packer.toBlob(doc);
     
-    // START OF NEW/UPDATED CODE for sharing
+    // START OF UPDATED LOGIC for sharing/opening
     const file = new File([blob], fileName, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
     if (navigator.share) {
@@ -329,17 +320,10 @@ export async function exportAdminDataToDocx(type, data, filterMonth, filterUserE
             alert('تعذر مشاركة الملف. قد لا يدعم جهازك هذه الميزة أو تم إلغاء المشاركة.');
         }
     } else {
-        // Fallback for browsers/devices that do not support Web Share API
-        console.log('Web Share API not supported. Falling back to download.');
+        // Fallback: Open file in a new window/tab if sharing is not supported
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert('ميزة المشاركة غير مدعومة في هذا المتصفح. سيتم تنزيل الملف مباشرة.');
+        window.open(url, '_blank');
+        alert('ميزة المشاركة غير مدعومة. تم فتح ملف التقرير في نافذة جديدة. يمكنك حفظه من النافذة الجديدة.');
     }
-    // END OF NEW/UPDATED CODE
+    // END OF UPDATED LOGIC
 }
